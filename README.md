@@ -55,11 +55,11 @@ Open **http://localhost:5173**.
 
 ```bash
 git pull
-npm run setup   # reinstalls dependencies if packages changed
+npm run update  # clears node_modules and reinstalls everything
 npm run dev
 ```
 
-> Your `.env` files and data in `backend/DBs/` are never touched by `git pull` or `npm run setup`.
+> `npm run update` works on Windows, macOS and Linux. Your `.env` files and data in `backend/DBs/` are never touched.
 
 ### Manual setup (step by step)
 
