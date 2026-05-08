@@ -51,6 +51,16 @@ Open **http://localhost:5173**.
 
 > `npm run setup` handles everything in one shot — root, backend and frontend deps + `.env` files from the examples.
 
+### Updating an existing installation
+
+```bash
+git pull
+npm run setup   # reinstalls dependencies if packages changed
+npm run dev
+```
+
+> Your `.env` files and data in `backend/DBs/` are never touched by `git pull` or `npm run setup`.
+
 ### Manual setup (step by step)
 
 ```bash
