@@ -1,0 +1,30 @@
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Local environment variables
+.env
+
+# Local financial data (personal — never commit)
+backend/DBs/
+backend/data.json
+backend/data.json.migrated
+backend/*.tmp
+
+# Local AI assistant config
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

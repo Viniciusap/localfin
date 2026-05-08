@@ -1,0 +1,16 @@
+{
+  "name": "localfin",
+  "version": "1.0.0",
+  "description": "Local personal finance tracker — React + Node.js",
+  "private": false,
+  "scripts": {
+    "dev": "concurrently --names \"API,UI\" --prefix-colors \"bgBlue.bold,bgCyan.bold\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "setup": "npm run install:all && node scripts/setup.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["finance", "personal-finance", "react", "nodejs", "typescript", "open-source"],
+  "license": "MIT"
+}
