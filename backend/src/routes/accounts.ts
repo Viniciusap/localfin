@@ -4,6 +4,7 @@ import {
 } from '../db/jsonStore';
 import transactionsRouter from './transactions';
 import backupsRouter from './backups';
+import recurringRouter from './recurring';
 
 const router = Router();
 
@@ -71,6 +72,7 @@ accountScoped.get('/months', (req, res) => {
 
 accountScoped.use('/months', transactionsRouter);
 accountScoped.use('/backups', backupsRouter);
+accountScoped.use('/recurring', recurringRouter);
 
 router.use('/:account', accountScoped);
 

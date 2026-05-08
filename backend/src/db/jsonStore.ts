@@ -1,8 +1,10 @@
 import fs from 'fs';
 import path from 'path';
+import { randomUUID } from 'crypto';
 import { DB_DIR, BACKUP_DIR } from '../config';
 import type { Transaction } from '../types/Transaction';
 import type { BackupFile } from '../types/Account';
+import type { RecurringTemplate } from '../types/Recurring';
 
 const ACCOUNT_NAME_RE = /^[a-zA-Z0-9_-]{1,50}$/;
 
@@ -13,6 +15,11 @@ function isValidAccountName(name: string): boolean {
 function accountPath(account: string): string {
   if (!isValidAccountName(account)) throw new Error(`Invalid account name: "${account}"`);
   return path.resolve(path.join(DB_DIR, `${account}.json`));
+}
+
+function recurringPath(account: string): string {
+  if (!isValidAccountName(account)) throw new Error(`Invalid account name: "${account}"`);
+  return path.resolve(path.join(DB_DIR, `${account}.recurring.json`));
 }
 
 // ── Bootstrap ────────────────────────────────────────────────────────────────
@@ -27,7 +34,6 @@ export function bootstrap(): void {
 
   if (existing.length === 0) {
     if (fs.existsSync(legacyFile)) {
-      // Migração: data.json antigo → DBs/default.json
       fs.copyFileSync(legacyFile, defaultAccount);
       fs.renameSync(legacyFile, legacyFile + '.migrated');
       console.log('Migrated data.json → DBs/default.json');
@@ -63,13 +69,16 @@ export function renameAccount(from: string, to: string): void {
   if (!fs.existsSync(fromPath)) throw new Error(`Account "${from}" not found`);
   if (fs.existsSync(toPath)) throw new Error(`Account "${to}" already exists`);
   fs.renameSync(fromPath, toPath);
+  const fromRecurring = recurringPath(from);
+  if (fs.existsSync(fromRecurring)) fs.renameSync(fromRecurring, recurringPath(to));
 }
 
 export function deleteAccount(name: string): void {
   const p = accountPath(name);
   if (!fs.existsSync(p)) throw new Error(`Account "${name}" not found`);
   fs.unlinkSync(p);
-  // remove backups da conta
+  const rp = recurringPath(name);
+  if (fs.existsSync(rp)) fs.unlinkSync(rp);
   for (const b of listBackups(name)) {
     const bp = path.resolve(path.join(BACKUP_DIR, b.filename));
     if (fs.existsSync(bp)) fs.unlinkSync(bp);
@@ -102,7 +111,6 @@ function makeTimestamp(): string {
 }
 
 function parseTimestamp(raw: string): string {
-  // "2026-05-03T14-30-15" → "2026-05-03T14:30:15"
   return raw.replace(/T(\d{2})-(\d{2})-(\d{2})$/, 'T$1:$2:$3');
 }
 
@@ -166,8 +174,67 @@ export function restoreBackup(account: string, filename: string): void {
   const backupSrc = path.resolve(path.join(BACKUP_DIR, basename));
   if (!fs.existsSync(backupSrc)) throw new Error('Backup not found');
 
-  // safety: backup automático do estado atual antes de restaurar
   createBackup(account, true);
-
   fs.copyFileSync(backupSrc, accountPath(account));
+}
+
+// ── Recorrências ──────────────────────────────────────────────────────────────
+
+function readRecurring(account: string): RecurringTemplate[] {
+  const p = recurringPath(account);
+  if (!fs.existsSync(p)) return [];
+  return JSON.parse(fs.readFileSync(p, 'utf-8')) as RecurringTemplate[];
+}
+
+function writeRecurring(account: string, data: RecurringTemplate[]): void {
+  const p = recurringPath(account);
+  const tmp = p + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf-8');
+  fs.renameSync(tmp, p);
+}
+
+export function listRecurring(account: string): RecurringTemplate[] {
+  if (!isValidAccountName(account)) throw new Error(`Invalid account name: "${account}"`);
+  return readRecurring(account);
+}
+
+export function createRecurring(account: string, data: Omit<RecurringTemplate, 'id'>): RecurringTemplate {
+  if (!isValidAccountName(account)) throw new Error(`Invalid account name: "${account}"`);
+  const template: RecurringTemplate = { id: randomUUID(), ...data };
+  writeRecurring(account, [...readRecurring(account), template]);
+  return template;
+}
+
+export function deleteRecurring(account: string, id: string): void {
+  if (!isValidAccountName(account)) throw new Error(`Invalid account name: "${account}"`);
+  const all = readRecurring(account);
+  const filtered = all.filter(t => t.id !== id);
+  if (filtered.length === all.length) throw new Error('Recurring template not found');
+  writeRecurring(account, filtered);
+}
+
+export function applyRecurring(account: string, templateId: string, month: string): Transaction | null {
+  const templates = readRecurring(account);
+  const template = templates.find(t => t.id === templateId);
+  if (!template) throw new Error('Recurring template not found');
+
+  const all = readAll(account);
+  if (all.some(tx => tx.recurringId === templateId && tx.date.startsWith(month))) {
+    return null; // already applied — idempotent
+  }
+
+  const day = String(Math.min(template.dayOfMonth, 28)).padStart(2, '0');
+  const tx: Transaction = {
+    id: randomUUID(),
+    title: template.title,
+    amount: template.amount,
+    type: template.type,
+    status: template.defaultStatus,
+    category: template.category,
+    date: `${month}-${day}`,
+    recurringId: template.id,
+  };
+
+  writeAll(account, [...all, tx]);
+  return tx;
 }

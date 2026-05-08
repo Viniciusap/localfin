@@ -48,6 +48,11 @@ export function TransactionList({ transactions, onRemove, onSetStatus, onEdit, v
                     transferido
                   </span>
                 )}
+                {tx.recurringId && (
+                  <span className="text-xs px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-full whitespace-nowrap">
+                    ↻
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                 {tx.category} · {formatDate(tx.date)}

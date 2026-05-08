@@ -2,6 +2,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import type { Transaction, TransactionStatus } from '../types/Transaction';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
+import { Combobox } from './ui/Combobox';
 
 interface Props {
   month: string;
@@ -10,15 +11,20 @@ interface Props {
   editTarget?: Transaction | null;
   onEditClose?: () => void;
   defaultStatus?: TransactionStatus;
+  extraCategories?: string[];
 }
 
-const CATEGORIES = [
-  'Alimentação', 'Transporte', 'Moradia', 'Saúde',
-  'Lazer', 'Educação', 'Transferência', 'Outros',
+export const DEFAULT_CATEGORIES = [
+  'Alimentação', 'Aluguel', 'Combustível', 'Contas',
+  'Educação', 'Farmácia', 'Freelance', 'Investimento',
+  'Lazer', 'Mercado', 'Moradia', 'Outros',
+  'Pets', 'Reembolso', 'Restaurante', 'Salário',
+  'Saúde', 'Streaming', 'Transferência', 'Transporte',
+  'Vestuário', 'Viagem',
 ];
 
 export function TransactionForm({
-  month, onAdd, onUpdate, editTarget, onEditClose, defaultStatus = 'confirmed',
+  month, onAdd, onUpdate, editTarget, onEditClose, defaultStatus = 'confirmed', extraCategories = [],
 }: Props) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -31,6 +37,8 @@ export function TransactionForm({
   const [error, setError] = useState<string | null>(null);
 
   const isEditing = editTarget != null;
+
+  const allCategories = [...new Set([...DEFAULT_CATEGORIES, ...extraCategories])].sort();
 
   useEffect(() => {
     if (!editTarget) return;
@@ -84,7 +92,7 @@ export function TransactionForm({
 
   return (
     <>
-      <Button onClick={openModal} className="mb-6">+ Nova Transação</Button>
+      <Button onClick={openModal}>+ Nova Transação</Button>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -135,14 +143,13 @@ export function TransactionForm({
               </div>
             </div>
 
-            <div className="flex flex-col gap-1">
-              <label htmlFor="category" className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Categoria</label>
-              <select id="category" value={category} onChange={e => setCategory(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-slate-500 transition"
-              >
-                {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-              </select>
-            </div>
+            <Combobox
+              label="Categoria"
+              value={category}
+              onChange={setCategory}
+              options={allCategories}
+              placeholder="Buscar ou digitar..."
+            />
 
             <Input label="Data" type="date" value={date} onChange={e => setDate(e.target.value)} required />
 

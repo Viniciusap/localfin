@@ -10,6 +10,7 @@ export interface Transaction {
   category: string;
   date: string;
   transferredFrom?: string;
+  recurringId?: string;
 }
 
 export interface Summary {

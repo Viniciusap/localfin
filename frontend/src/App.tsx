@@ -1,17 +1,20 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Transaction } from './types/Transaction';
 import { useAccount } from './hooks/useAccount';
 import { useMonthNav } from './hooks/useMonthNav';
 import { useAccounts } from './hooks/useAccounts';
 import { useDarkMode } from './hooks/useDarkMode';
+import { useRecurring } from './hooks/useRecurring';
 import { MonthHeader } from './components/MonthHeader';
 import { SummaryCards } from './components/SummaryCards';
 import { MonthCharts } from './components/MonthCharts';
 import { TransferBalance } from './components/TransferBalance';
-import { TransactionForm } from './components/TransactionForm';
+import { TransactionForm, DEFAULT_CATEGORIES } from './components/TransactionForm';
 import { TransactionList } from './components/TransactionList';
 import { MonthsOverview } from './components/MonthsOverview';
 import { AccountsManager } from './components/AccountsManager';
+import { RecurringPanel } from './components/RecurringPanel';
+import { Button } from './components/ui/Button';
 
 export default function App() {
   const { isDark, toggle: toggleDark } = useDarkMode();
@@ -23,10 +26,27 @@ export default function App() {
     add, update: updateTx, remove: removeTx, setStatus, transferTo,
     refresh: refreshTransactions,
   } = useAccounts(account, nav.month);
+  const { templates, create: createRecurring, apply: applyRecurring, remove: removeRecurring } = useRecurring(account);
 
   const [historyOpen, setHistoryOpen] = useState(false);
   const [managerOpen, setManagerOpen] = useState(false);
+  const [recurringOpen, setRecurringOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+
+  const extraCategories = useMemo(
+    () => [...new Set(transactions.map(t => t.category))],
+    [transactions],
+  );
+
+  const allCategories = useMemo(
+    () => [...new Set([...DEFAULT_CATEGORIES, ...extraCategories])].sort(),
+    [extraCategories],
+  );
+
+  const appliedRecurringIds = useMemo(
+    () => new Set(transactions.flatMap(t => t.recurringId ? [t.recurringId] : [])),
+    [transactions],
+  );
 
   if (!account) {
     return (
@@ -60,13 +80,17 @@ export default function App() {
 
         <MonthCharts transactions={transactions} isDark={isDark} />
 
-        <TransactionForm
-          month={nav.month}
-          onAdd={add}
-          onUpdate={updateTx}
-          editTarget={editingTx}
-          onEditClose={() => setEditingTx(null)}
-        />
+        <div className="flex items-center gap-3 mb-6">
+          <TransactionForm
+            month={nav.month}
+            onAdd={add}
+            onUpdate={updateTx}
+            editTarget={editingTx}
+            onEditClose={() => setEditingTx(null)}
+            extraCategories={extraCategories}
+          />
+          <Button variant="ghost" onClick={() => setRecurringOpen(true)}>↻ Recorrentes</Button>
+        </div>
 
         {error && (
           <p className="text-sm text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 rounded-xl px-4 py-3 mb-4">{error}</p>
@@ -117,6 +141,20 @@ export default function App() {
           onRemove={remove}
           onRestored={() => { void refreshTransactions(); void refreshAccounts(); }}
           onClose={() => setManagerOpen(false)}
+        />
+      )}
+
+      {recurringOpen && (
+        <RecurringPanel
+          currentMonth={nav.month}
+          templates={templates}
+          appliedIds={appliedRecurringIds}
+          suggestedCategories={allCategories}
+          onCreate={createRecurring}
+          onApply={applyRecurring}
+          onRemove={removeRecurring}
+          onApplied={() => void refreshTransactions()}
+          onClose={() => setRecurringOpen(false)}
         />
       )}
     </div>

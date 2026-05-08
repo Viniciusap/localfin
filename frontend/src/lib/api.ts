@@ -1,6 +1,7 @@
 import { API_URL } from '../config/env';
 import type { Transaction, Summary, TransactionStatus } from '../types/Transaction';
 import type { BackupFile } from '../types/Account';
+import type { RecurringTemplate } from '../types/Recurring';
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
@@ -53,6 +54,13 @@ export const api = {
 
     transfer: (account: string, month: string, toMonth: string) =>
       request<Transaction>(`${mo(account, month)}/transfer-balance`, { method: 'POST', body: JSON.stringify({ toMonth }) }),
+  },
+
+  recurring: {
+    list:   (account: string)                                      => request<RecurringTemplate[]>(`${acc(account)}/recurring`),
+    create: (account: string, data: Omit<RecurringTemplate, 'id'>) => request<RecurringTemplate>(`${acc(account)}/recurring`, { method: 'POST', body: JSON.stringify(data) }),
+    apply:  (account: string, id: string, month: string)           => request<Transaction>(`${acc(account)}/recurring/${id}/apply`, { method: 'POST', body: JSON.stringify({ month }) }),
+    remove: (account: string, id: string)                          => request<void>(`${acc(account)}/recurring/${id}`, { method: 'DELETE' }),
   },
 
   backups: {
