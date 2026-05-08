@@ -90,7 +90,7 @@ export function RecurringPanel({
   return (
     <div className="fixed inset-0 z-40 flex">
       <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="w-full max-w-sm bg-white dark:bg-slate-900 shadow-2xl flex flex-col overflow-hidden">
+      <div data-testid="recurring-panel" className="w-full max-w-sm bg-white dark:bg-slate-900 shadow-2xl flex flex-col overflow-hidden">
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
@@ -98,7 +98,7 @@ export function RecurringPanel({
             <h2 className="text-base font-semibold text-slate-800 dark:text-slate-100">Recorrências</h2>
             <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Aplicar em {monthLabel}</p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-2xl leading-none px-1">×</button>
+          <button onClick={onClose} aria-label="Fechar" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-2xl leading-none px-1">×</button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
@@ -124,7 +124,7 @@ export function RecurringPanel({
               {templates.map(t => {
                 const applied = appliedIds.has(t.id);
                 return (
-                  <div key={t.id} className={`rounded-2xl border px-4 py-3 flex flex-col gap-2 transition-opacity ${applied ? 'opacity-50' : ''} ${
+                  <div key={t.id} data-testid="recurring-template" className={`rounded-2xl border px-4 py-3 flex flex-col gap-2 transition-opacity ${applied ? 'opacity-50' : ''} ${
                     t.type === 'income'
                       ? 'bg-emerald-50/60 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/30'
                       : 'bg-rose-50/60 dark:bg-rose-900/10 border-rose-100 dark:border-rose-800/30'

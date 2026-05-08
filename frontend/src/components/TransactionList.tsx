@@ -27,6 +27,7 @@ export function TransactionList({ transactions, onRemove, onSetStatus, onEdit, v
       {sorted.map(tx => (
         <div
           key={tx.id}
+          data-testid="tx-item"
           className={`flex items-center justify-between px-4 py-3 rounded-2xl border transition-colors ${
             isPending
               ? 'bg-white dark:bg-slate-800/50 border-dashed border-slate-200 dark:border-slate-600 opacity-75'
@@ -82,6 +83,7 @@ export function TransactionList({ transactions, onRemove, onSetStatus, onEdit, v
               <button
                 onClick={() => onSetStatus(tx.id, 'pending')}
                 className="text-xs px-2 py-1 rounded-lg text-slate-300 dark:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                aria-label="Mover para previsto"
                 title="Mover para previsto"
               >
                 ◷
