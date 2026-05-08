@@ -52,6 +52,7 @@ test.describe('Recurring templates', () => {
     await page.getByRole('button', { name: '+ Nova recorrência' }).click();
     await page.getByLabel('Descrição').fill('test-recurring-delete');
     await page.getByLabel('Valor (R$)').fill('50');
+    await page.getByLabel('Categoria').fill('Outros');
     await page.getByLabel('Dia do mês (1–28)').fill('10');
     await page.getByRole('button', { name: 'Criar' }).click();
 

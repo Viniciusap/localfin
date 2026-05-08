@@ -1,5 +1,6 @@
 import type { Transaction, TransactionStatus } from '../types/Transaction';
 import { formatCurrency, formatDate } from '../lib/format';
+import { getCategoryIcon } from '../lib/categories';
 
 interface Props {
   transactions: Transaction[];
@@ -56,7 +57,7 @@ export function TransactionList({ transactions, onRemove, onSetStatus, onEdit, v
                 )}
               </div>
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                {tx.category} · {formatDate(tx.date)}
+                {getCategoryIcon(tx.category)} {tx.category} · {formatDate(tx.date)}
               </p>
             </div>
           </div>

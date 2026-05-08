@@ -1,8 +1,11 @@
 import { useState, useEffect, FormEvent } from 'react';
 import type { Transaction, TransactionStatus } from '../types/Transaction';
+import { DEFAULT_CATEGORIES, CATEGORY_ICONS } from '../lib/categories';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Combobox } from './ui/Combobox';
+
+export { DEFAULT_CATEGORIES };
 
 interface Props {
   month: string;
@@ -14,15 +17,6 @@ interface Props {
   extraCategories?: string[];
 }
 
-export const DEFAULT_CATEGORIES = [
-  'Alimentação', 'Aluguel', 'Combustível', 'Contas',
-  'Educação', 'Farmácia', 'Freelance', 'Investimento',
-  'Lazer', 'Mercado', 'Moradia', 'Outros',
-  'Pets', 'Reembolso', 'Restaurante', 'Salário',
-  'Saúde', 'Streaming', 'Transferência', 'Transporte',
-  'Vestuário', 'Viagem',
-];
-
 export function TransactionForm({
   month, onAdd, onUpdate, editTarget, onEditClose, defaultStatus = 'confirmed', extraCategories = [],
 }: Props) {
@@ -31,7 +25,7 @@ export function TransactionForm({
   const [amount, setAmount] = useState('');
   const [type, setType] = useState<'income' | 'outcome'>('outcome');
   const [status, setStatus] = useState<TransactionStatus>(defaultStatus);
-  const [category, setCategory] = useState('Outros');
+  const [category, setCategory] = useState('');
   const [date, setDate] = useState(`${month}-01`);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +48,7 @@ export function TransactionForm({
 
   function openModal() {
     setTitle(''); setAmount(''); setType('outcome');
-    setStatus(defaultStatus); setCategory('Outros');
+    setStatus(defaultStatus); setCategory('');
     setDate(`${month}-01`); setError(null);
     setOpen(true);
   }
@@ -66,7 +60,10 @@ export function TransactionForm({
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!title || !amount || !date) return;
+    if (!title || !amount || !date || !category) {
+      setError('Preencha todos os campos obrigatórios.');
+      return;
+    }
     setLoading(true); setError(null);
     const data: Omit<Transaction, 'id'> = {
       title,
@@ -148,7 +145,8 @@ export function TransactionForm({
               value={category}
               onChange={setCategory}
               options={allCategories}
-              placeholder="Buscar ou digitar..."
+              icons={CATEGORY_ICONS}
+              placeholder="Selecione ou digite..."
             />
 
             <Input label="Data" type="date" value={date} onChange={e => setDate(e.target.value)} required />

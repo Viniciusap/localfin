@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import type { RecurringTemplate } from '../types/Recurring';
 import type { Transaction } from '../types/Transaction';
 import { formatCurrency } from '../lib/format';
+import { CATEGORY_ICONS } from '../lib/categories';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Combobox } from './ui/Combobox';
@@ -28,7 +29,7 @@ export function RecurringPanel({
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState<'income' | 'outcome'>('outcome');
-  const [category, setCategory] = useState('Outros');
+  const [category, setCategory] = useState('');
   const [dayOfMonth, setDayOfMonth] = useState('1');
   const [defaultStatus, setDefaultStatus] = useState<'confirmed' | 'pending'>('pending');
   const [saving, setSaving] = useState(false);
@@ -38,7 +39,7 @@ export function RecurringPanel({
 
   function resetForm() {
     setTitle(''); setAmount(''); setType('outcome');
-    setCategory('Outros'); setDayOfMonth('1');
+    setCategory(''); setDayOfMonth('1');
     setDefaultStatus('pending'); setFormError(null);
   }
 
@@ -195,7 +196,7 @@ export function RecurringPanel({
                 </div>
               </div>
 
-              <Combobox label="Categoria" value={category} onChange={setCategory} options={suggestedCategories} placeholder="Buscar ou digitar..." />
+              <Combobox label="Categoria" value={category} onChange={setCategory} options={suggestedCategories} icons={CATEGORY_ICONS} placeholder="Selecione ou digite..." />
 
               <Input label="Dia do mês (1–28)" type="number" min="1" max="28" value={dayOfMonth} onChange={e => setDayOfMonth(e.target.value)} required />
 

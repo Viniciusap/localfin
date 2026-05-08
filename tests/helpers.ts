@@ -30,7 +30,7 @@ export async function openTransactionForm(
   if (opts.type === 'income') await page.getByRole('button', { name: '↑ Entrada' }).click();
   if (opts.type === 'outcome') await page.getByRole('button', { name: '↓ Saída' }).click();
   if (opts.status === 'pending') await page.getByRole('button', { name: '◷ Prevista' }).click();
-  if (opts.category) await page.getByLabel('Categoria').fill(opts.category);
+  await page.getByLabel('Categoria').fill(opts.category ?? 'Outros');
   await page.getByRole('button', { name: 'Salvar' }).click();
   await page.getByText(opts.title).waitFor();
 }
