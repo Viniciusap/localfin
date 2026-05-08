@@ -43,14 +43,13 @@ Most finance apps store your data in their cloud, require an account, and lock y
 ```bash
 git clone https://github.com/Viniciusap/localfin.git
 cd localfin
-npm install       # installs concurrently
-npm run setup     # installs backend + frontend deps and creates .env files
-npm run dev       # starts backend :3333 and frontend :5173 together
+npm run setup   # installs all dependencies and creates .env files
+npm run dev     # starts backend :3333 and frontend :5173 together
 ```
 
 Open **http://localhost:5173**.
 
-> `npm run setup` copies `.env.example` to `.env` for both packages. Re-run it if you ever delete your `.env` files.
+> `npm run setup` handles everything in one shot — root, backend and frontend deps + `.env` files from the examples.
 
 ### Manual setup (step by step)
 
@@ -58,7 +57,7 @@ Open **http://localhost:5173**.
 git clone https://github.com/Viniciusap/localfin.git
 cd localfin
 
-npm install                                        # root (concurrently)
+npm install                                          # root
 cd backend  && cp .env.example .env && npm install && cd ..
 cd frontend && cp .env.example .env && npm install && cd ..
 
