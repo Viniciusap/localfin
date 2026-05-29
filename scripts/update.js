@@ -17,6 +17,8 @@ function run(cmd) {
 
 console.log('\n  localfin — updating...\n');
 
+run('git pull');
+
 rimraf(path.join(root, 'node_modules'));
 rimraf(path.join(root, 'backend', 'node_modules'));
 rimraf(path.join(root, 'frontend', 'node_modules'));
@@ -24,4 +26,7 @@ rimraf(path.join(root, 'frontend', 'node_modules'));
 console.log('\n  reinstalling dependencies...\n');
 run('npm run setup');
 
-console.log('\n  Done. Run: npm run dev\n');
+console.log('\n  building...\n');
+run('npm run build');
+
+console.log('\n  Done. Run: npm start\n');
