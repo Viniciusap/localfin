@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { listBackups, createBackup, deleteBackup, restoreBackup } from '../db/jsonStore';
+import { listBackups, createBackup, deleteBackup, restoreBackup, getBackupFilePath } from '../db/jsonStore';
 
 const router = Router({ mergeParams: true });
 
@@ -20,6 +20,17 @@ router.post('/', (req, res) => {
   const { account } = req.params as P;
   try {
     res.status(201).json(createBackup(account));
+  } catch (e) {
+    res.status(400).json({ error: (e as Error).message });
+  }
+});
+
+// GET /api/accounts/:account/backups/:filename/download
+router.get('/:filename/download', (req, res) => {
+  const { account, filename } = req.params as P;
+  try {
+    const filePath = getBackupFilePath(account, filename);
+    res.download(filePath, filename);
   } catch (e) {
     res.status(400).json({ error: (e as Error).message });
   }

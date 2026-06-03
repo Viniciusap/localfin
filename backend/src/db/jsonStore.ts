@@ -165,6 +165,17 @@ export function deleteBackup(account: string, filename: string): void {
   fs.unlinkSync(p);
 }
 
+export function getBackupFilePath(account: string, filename: string): string {
+  if (!isValidAccountName(account)) throw new Error(`Invalid account name`);
+  const basename = path.basename(filename);
+  if (!basename.startsWith(`${account}__`) || !basename.endsWith('.json')) {
+    throw new Error('Backup does not belong to this account');
+  }
+  const p = path.resolve(path.join(BACKUP_DIR, basename));
+  if (!fs.existsSync(p)) throw new Error('Backup not found');
+  return p;
+}
+
 export function restoreBackup(account: string, filename: string): void {
   if (!isValidAccountName(account)) throw new Error(`Invalid account name`);
   const basename = path.basename(filename);

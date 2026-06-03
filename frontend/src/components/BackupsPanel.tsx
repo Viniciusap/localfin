@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useBackups } from '../hooks/useBackups';
 import { Button } from './ui/Button';
+import { API_URL } from '../config/env';
 
 interface Props {
   account: string;
@@ -78,6 +79,11 @@ export function BackupsPanel({ account, onClose, onRestored }: Props) {
                 <button onClick={() => setConfirmRestore(b.filename)}
                   className="text-xs px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
                 >Restaurar</button>
+                <a
+                  href={`${API_URL}/api/accounts/${account}/backups/${b.filename}/download`}
+                  download={b.filename}
+                  className="text-xs px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+                >↓</a>
                 <button onClick={() => handleRemove(b.filename)}
                   className="text-xs px-2 py-1 rounded-lg text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
                 >×</button>
