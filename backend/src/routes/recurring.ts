@@ -26,6 +26,14 @@ router.post('/', (req, res) => {
     res.status(400).json({ error: 'Required fields: title, amount, type, category, dayOfMonth' });
     return;
   }
+  if (typeof title !== 'string' || title.trim().length === 0 || title.length > 200) {
+    res.status(400).json({ error: 'title must be 1–200 characters' });
+    return;
+  }
+  if (typeof category !== 'string' || category.trim().length === 0 || category.length > 50) {
+    res.status(400).json({ error: 'category must be 1–50 characters' });
+    return;
+  }
   const numAmount = Number(amount);
   if (!Number.isFinite(numAmount) || numAmount <= 0) {
     res.status(400).json({ error: 'amount must be a positive number' });

@@ -8,9 +8,14 @@ const router = Router({ mergeParams: true });
 type P = Record<string, string>;
 
 const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
+const DATE_RE  = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 
 function isValidMonth(m: string): boolean {
   return MONTH_RE.test(m);
+}
+
+function isValidDate(d: string): boolean {
+  return DATE_RE.test(d) && !isNaN(new Date(d).getTime());
 }
 
 // GET /api/accounts/:account/months/:month/transactions
@@ -36,9 +41,25 @@ router.post('/:month/transactions', (req, res) => {
     res.status(400).json({ error: 'Required fields: title, amount, type, category, date' });
     return;
   }
+  if (type !== 'income' && type !== 'outcome') {
+    res.status(400).json({ error: 'type must be "income" or "outcome"' });
+    return;
+  }
+  if (typeof title !== 'string' || title.trim().length === 0 || title.length > 200) {
+    res.status(400).json({ error: 'title must be 1–200 characters' });
+    return;
+  }
+  if (typeof category !== 'string' || category.trim().length === 0 || category.length > 50) {
+    res.status(400).json({ error: 'category must be 1–50 characters' });
+    return;
+  }
   const numAmount = Number(amount);
   if (!Number.isFinite(numAmount) || numAmount <= 0) {
     res.status(400).json({ error: 'amount must be a positive number' });
+    return;
+  }
+  if (!isValidDate(date)) {
+    res.status(400).json({ error: 'date must be a valid YYYY-MM-DD' });
     return;
   }
   if (!date.startsWith(month)) {
@@ -73,12 +94,32 @@ router.patch('/:month/transactions/:id', (req, res) => {
   const { title, amount, type, status, category, date } =
     req.body as Partial<Omit<Transaction, 'id' | 'transferredFrom'>>;
 
+  if (type !== undefined && type !== 'income' && type !== 'outcome') {
+    res.status(400).json({ error: 'type must be "income" or "outcome"' });
+    return;
+  }
+  if (status !== undefined && status !== 'confirmed' && status !== 'pending') {
+    res.status(400).json({ error: 'status must be "confirmed" or "pending"' });
+    return;
+  }
+  if (title !== undefined && (typeof title !== 'string' || title.trim().length === 0 || title.length > 200)) {
+    res.status(400).json({ error: 'title must be 1–200 characters' });
+    return;
+  }
+  if (category !== undefined && (typeof category !== 'string' || category.trim().length === 0 || category.length > 50)) {
+    res.status(400).json({ error: 'category must be 1–50 characters' });
+    return;
+  }
   if (amount !== undefined) {
     const n = Number(amount);
     if (!Number.isFinite(n) || n <= 0) {
       res.status(400).json({ error: 'amount must be a positive number' });
       return;
     }
+  }
+  if (date !== undefined && !isValidDate(date)) {
+    res.status(400).json({ error: 'date must be a valid YYYY-MM-DD' });
+    return;
   }
   if (date !== undefined && !date.startsWith(month)) {
     res.status(400).json({ error: 'Transaction date does not belong to the given month' });
