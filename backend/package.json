@@ -6,6 +6,9 @@
     "build": "tsc",
     "start": "node dist/server.js"
   },
+  "overrides": {
+    "qs": "6.15.2"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
