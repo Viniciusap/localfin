@@ -3,9 +3,15 @@
   "version": "1.0.0",
   "description": "Local personal finance tracker — React + Node.js",
   "private": false,
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
+    "predev": "node scripts/predev.js",
     "dev": "node scripts/banner.js && concurrently --names \"API,UI\" --prefix-colors \"bgBlue.bold,bgCyan.bold\" --kill-others-on-fail \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
     "build": "npm run build --prefix frontend && npm run build --prefix backend",
+    "build:demo": "npm run build --prefix frontend -- --mode demo",
     "start": "npm run start --prefix backend",
     "install:all": "npm install --prefix backend && npm install --prefix frontend",
     "setup": "npm install && npm run install:all && node scripts/setup.js",

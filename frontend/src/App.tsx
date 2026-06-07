@@ -16,6 +16,9 @@ import { MonthsOverview } from './components/MonthsOverview';
 import { AccountsManager } from './components/AccountsManager';
 import { RecurringPanel } from './components/RecurringPanel';
 import { Button } from './components/ui/Button';
+import { DemoBanner } from './components/DemoBanner';
+
+const IS_DEMO = import.meta.env.VITE_DEMO === 'true';
 
 export default function App() {
   const { isDark, toggle: toggleDark } = useDarkMode();
@@ -59,6 +62,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
+      {IS_DEMO && <DemoBanner />}
       <div className="max-w-5xl mx-auto px-4 py-8">
         <MonthHeader
           account={account}

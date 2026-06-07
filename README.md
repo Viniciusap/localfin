@@ -2,6 +2,7 @@
 
 > Local-first personal finance tracker. No database, no cloud, no signup. Your data is a JSON file on your own machine.
 
+[![Live Demo](https://img.shields.io/badge/demo-live-violet?style=flat)](https://viniciusap.github.io/localfin/)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-green.svg)
 ![React](https://img.shields.io/badge/react-18-61DAFB.svg)
@@ -36,41 +37,47 @@ Most finance apps store your data in their cloud, require an account, and lock y
 
 ---
 
+## Live Demo
+
+**[→ viniciusap.github.io/localfin](https://viniciusap.github.io/localfin/)**
+
+Explore the full UI with 6 months of realistic fake data. All features work (add, edit, delete, recurring, backups). Data resets on page reload.
+
+> To enable on your fork: go to **Settings → Pages → Source → GitHub Actions**, then push to main.
+
+---
+
 ## Quick Start
 
-**Prerequisites:** [Node.js](https://nodejs.org/) 18+ and npm 9+
+**Prerequisite:** [Node.js 18+](https://nodejs.org)
 
 ```bash
 git clone https://github.com/Viniciusap/localfin.git
 cd localfin
-npm run setup   # installs all dependencies and creates .env files
-npm run dev     # starts backend :3333 and frontend :5173 together
+npm run dev
 ```
 
-Open **http://localhost:5173**.
+The browser opens automatically at **http://localhost:5173**.
 
-> `npm run setup` handles everything in one shot — root, backend and frontend deps + `.env` files from the examples.
+> First run auto-installs all dependencies and creates `.env` files from the examples. Subsequent runs start instantly.
 
-### Updating an existing installation
+### Updating
 
 ```bash
 git pull
-npm run update  # clears node_modules and reinstalls everything
-npm run dev
+npm run update
 ```
 
 > `npm run update` works on Windows, macOS and Linux. Your `.env` files and data in `backend/DBs/` are never touched.
 
-### Manual setup (step by step)
+### Manual setup (advanced)
+
+If you prefer explicit control:
 
 ```bash
 git clone https://github.com/Viniciusap/localfin.git
 cd localfin
-
-npm install                                          # root
-cd backend  && cp .env.example .env && npm install && cd ..
-cd frontend && cp .env.example .env && npm install && cd ..
-
+npm run setup   # install deps + create .env files
 npm run dev
 ```
 
@@ -197,7 +204,12 @@ localfin/
 │   ├── .env.example
 │   └── package.json
 │
-├── scripts/setup.js               # copies .env.example → .env
+├── .devcontainer/devcontainer.json # GitHub Codespaces config
+├── scripts/
+│   ├── predev.js                  # auto-bootstrap: Node check, deps, .env
+│   ├── setup.js                   # copies .env.example → .env
+│   ├── update.js                  # git pull + clean reinstall + build
+│   └── banner.js                  # startup ASCII art
 ├── package.json                   # root scripts + concurrently
 ├── LICENSE
 └── README.md
@@ -241,6 +253,7 @@ Base path: `/api/accounts/:account/`
 |--------|-------|-------------|
 | `GET` | `/api/accounts/:account/backups` | List backups |
 | `POST` | `/api/accounts/:account/backups` | Create manual backup |
+| `GET` | `/api/accounts/:account/backups/:filename/download` | Download backup as JSON file |
 | `POST` | `/api/accounts/:account/backups/:filename/restore` | Restore (auto-backup current state first) |
 | `DELETE` | `/api/accounts/:account/backups/:filename` | Delete |
 

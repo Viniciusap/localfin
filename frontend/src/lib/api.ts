@@ -21,7 +21,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 const acc = (account: string) => `/api/accounts/${account}`;
 const mo  = (account: string, month: string) => `${acc(account)}/months/${month}`;
 
-export const api = {
+const liveApi = {
   accounts: {
     list: ()                           => request<string[]>('/api/accounts'),
     create: (name: string)             => request<{ name: string }>('/api/accounts', { method: 'POST', body: JSON.stringify({ name }) }),
@@ -70,3 +70,6 @@ export const api = {
     remove:  (account: string, filename: string)     => request<void>(`${acc(account)}/backups/${filename}`, { method: 'DELETE' }),
   },
 };
+
+import { demoApi } from './demoApi';
+export const api = import.meta.env.VITE_DEMO === 'true' ? demoApi : liveApi;
